@@ -3,6 +3,7 @@ import pickle
 import os.path
 import io
 import glob
+import sys
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
@@ -39,8 +40,24 @@ def download_pdf(file_id, filename, service):
     service.files().delete(fileId=file_id).execute()
 
 
+def resolve_path(in_path):
+    if in_path[0] == "~":
+        return os.path.normpath(os.path.expanduser(in_path)) + "/"
+    return os.path.abspath(in_path) + "/"
+
+
+def get_globs(path, extension):
+    st = resolve_path(path) + "*." + extension
+    print(st)
+    return glob.glob(st)
+
+
 def convert_all_docs(service):
-    docs = glob.glob("*.docx")
+    if len(sys.argv) == 1:
+        docs = glob.glob("*.docx")
+    else:
+        target_dir = sys.argv[1]
+        docs = get_globs(target_dir, "docx")
     for filename in docs:
         file_id = upload_docx(filename, service)
         newfile = os.path.splitext(filename)[0] + ".pdf"
