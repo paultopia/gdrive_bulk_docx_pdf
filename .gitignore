@@ -1,0 +1,8 @@
+token.json
+token*
+*.json
+*.pickle
+credentials*
+credentials.json
+token.pickle
+credentials.pickle
